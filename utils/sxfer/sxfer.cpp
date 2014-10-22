@@ -44,7 +44,7 @@ int32_t open_comm()
                        0,                  
                        NULL,               
                        OPEN_EXISTING,      
-                       0,                  
+                       FILE_FLAG_OVERLAPPED,                  
                        NULL);
 
     if (hComm == INVALID_HANDLE_VALUE) 
@@ -129,14 +129,14 @@ int32_t main()
     hMutex = CreateMutex(NULL, false, NULL);
 
     if (hMutex == NULL) {
-        printf("CreateMutex error: %d\n", GetLastError());
+        printf("CreateMutex error: %u\n", GetLastError());
         return 1;
     }
 
     tTerminate = false;
 
     /* Create worker thread */
-#if 0
+#if 1
     hThread = CreateThread(NULL,       
                            0,          
                            (LPTHREAD_START_ROUTINE)cts_listener, 
@@ -159,25 +159,25 @@ int32_t main()
     //send_pl(0x5678);
     
     t_data(HIGH);
-    DWORD evtMask;
+    //DWORD evtMask;
     //WaitCommEvent(hComm, &evtMask, NULL);
-    GetCommModemStatus(hComm, &evtMask);
-    if (evtMask == MS_CTS_ON) { 
-        printf("CTS HIGH\n");
-    }
+    //GetCommModemStatus(hComm, &evtMask);
+    //if (evtMask == MS_CTS_ON) { 
+    //    printf("CTS HIGH\n");
+    //}
     Sleep(1);
  
-    //WaitForSingleObject(hMutex, INFINITE);
-    //printf("0000\n");
-    //if (ctsEvent) {
-    //    printf("CTS HIGH\n");
-    //    printf("1\n");
-    //    ctsEvent = false;
-    //    printf("2\n");
-    //}
-    //if(!ReleaseMutex(hMutex)){
-    //    printf("AHH!\n");
-    //}
+    WaitForSingleObject(hMutex, INFINITE);
+    printf("0000\n");
+    if (ctsEvent) {
+        printf("CTS HIGH\n");
+        printf("1\n");
+        ctsEvent = false;
+        printf("2\n");
+    }
+    if(!ReleaseMutex(hMutex)){
+        printf("AHH!\n");
+    }
 
     //DWORD commErr;
     //COMSTAT commStat;
@@ -190,12 +190,12 @@ int32_t main()
     Sleep(1);
     t_data(LOW);
     printf("4\n");
-    GetCommModemStatus(hComm, &evtMask);
-    if (evtMask != MS_CTS_ON) { 
-        printf("CTS LOW\n");
-    }
-    Sleep(10);
-    printf("5\n");
+    //GetCommModemStatus(hComm, &evtMask);
+    //if (evtMask != MS_CTS_ON) { 
+    //    printf("CTS LOW\n");
+    //}
+    //Sleep(10);
+    //printf("5\n");
 
     WaitForSingleObject(hMutex, INFINITE);
     printf("6\n");
@@ -222,7 +222,7 @@ int32_t main()
     
     tTerminate = true;
     WaitForSingleObject(hThread, INFINITE);
-    //CloseHandle(hThread);
+    CloseHandle(hThread);
     CloseHandle(hMutex);
 
 
@@ -243,7 +243,7 @@ DWORD WINAPI cts_listener(LPVOID lpParam)
             printf("termintate!\n");
             return 0;
         }
-
+#error // Need to pass OVERLAPPED structure to waitCommEvent. see http://msdn.microsoft.com/en-us/library/ff802693.aspx
         /* Wait for an event on the CTS pin */
         WaitCommEvent(hComm, &evtMask, NULL); 
 
