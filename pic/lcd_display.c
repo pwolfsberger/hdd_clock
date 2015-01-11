@@ -112,7 +112,7 @@ void lcd_write(const uint8_t* text, uint8_t length)
     /* For now check that the text string lenght is less than
      * or equal to the display width. If not, truncate the text. 
      */
-    // TODO Implement scrolling text for strings that a too long.
+    // TODO Implement scrolling text for strings that are too long.
     if (length > LCD_CHAR_WIDTH) {
         length = LCD_CHAR_WIDTH;
     }
