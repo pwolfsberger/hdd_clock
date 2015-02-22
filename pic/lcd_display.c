@@ -99,6 +99,7 @@ void lcd_open(void)
     lcd_wcmd(LCD_CURSOR_HOME);
     lcd_wcmd(LCD_CURSOR_ULINE_ON);
     lcd_wcmd(LCD_CURSOR_BLINK_ON);
+    Delay1KTCYx(25);	// Delay 100 ms
 }
     
 /**
